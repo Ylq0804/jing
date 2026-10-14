@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#EAF6FA">
+<title>京京追圆圆日记</title>
+<style>
+/* ========== 主题变量：湖蓝色（浅色默认，支持深色模式） ========== */
+:root{
+  --bg:#EAF6FA; --card:#FFFFFF; --field:#F5FBFD;
+  --text:#1F3A44; --sub:#7DA3AE; --line:#D5EAF0;
+  --accent:#38B6D9; --accent2:#8CDBEC; --accent3:#BFEAF4;
+  --primary:#1E93B5; --primary-text:#FFFFFF;
+  --danger:#F0836F; --ok:#4CC38A; --gold:#F2B84B;
+  --hero1:#CDEEF6; --hero2:#E9F7FA;
+  --shadow:0 8px 22px rgba(30,120,150,.12); --r:20px;
+}
+html[data-theme="dark"]{
+  --bg:#0E1E24; --card:#142A32; --field:#18333C;
+  --text:#E6F3F7; --sub:#87ABB6; --line:#22434E;
+  --accent:#38B6D9; --accent2:#2E8FA8; --accent3:#1F5566;
+  --primary:#38B6D9; --primary-text:#0E2028;
+  --danger:#F0836F; --ok:#4CC38A; --gold:#E0A63A;
+  --hero1:#123642; --hero2:#15313A;
+  --shadow:0 8px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(56,182,217,.10) 1.5px,transparent 1.5px);
+  background-size:26px 26px;
+}
+html[data-theme="dark"] body{background-image:radial-gradient(rgba(56,182,217,.06) 1.5px,transparent 1.5px)}
+/* ========== 顶栏 ========== */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:54px;z-index:30;
+  display:flex;align-items:center;gap:10px;padding:0 12px;
+  padding-top:env(safe-area-inset-top);
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+.topbar .title{font-size:17px;font-weight:700;flex:1}
+.icon-btn{
+  width:42px;height:42px;border:none;border-radius:50%;font-size:19px;cursor:pointer;
+  background:var(--field);color:var(--text);border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+}
+/* ========== 侧边抽屉导航 ========== */
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:236px;z-index:40;
+  background:var(--card);border-right:1px solid var(--line);
+  transform:translateX(-105%);transition:transform .25s ease;
+  padding:16px 10px;overflow-y:auto;display:flex;flex-direction:column;
+}
+.drawer.open{transform:none;box-shadow:8px 0 30px rgba(0,0,0,.15)}
+.drawer .brand{font-size:17px;font-weight:800;padding:6px 12px 14px;color:var(--primary)}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:2px;
+  border-radius:12px;font-size:15px;cursor:pointer;color:var(--text);user-select:none;
+  min-height:46px;
+}
+.nav-item:active{background:var(--bg)}
+.nav-item.on{background:linear-gradient(120deg,var(--accent),var(--accent2));color:#0E2028;font-weight:700}
+.drawer .foot{margin-top:auto;padding:12px;font-size:12px;color:var(--sub);line-height:1.5}
+.mask{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:35;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.mask.show{opacity:1;pointer-events:auto}
+/* 桌面端：侧边栏常驻 */
+@media(min-width:900px){
+  .drawer{transform:none}
+  .mask{display:none}
+  #btnMenu{display:none}
+  .topbar{left:236px}
+  main{margin-left:236px;max-width:860px}
+}
+/* ========== 主区域 ========== */
+main{padding:66px 12px calc(28px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto}
+.page{display:none}
+.page.active{display:block}
+.page h2{font-size:18px;margin:4px 2px 12px}
+.card{
+  background:var(--card);border:2px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:14px;margin-bottom:14px;
+}
+.card h3{font-size:15px;margin-bottom:4px}
+.card>input,.card>select,.card>textarea,.card>.row,.card>.btn,.card>canvas,.card>.mt,.card>#pf-grid{margin-top:8px}
+/* ========== 表单控件（触控友好，最小 44px） ========== */
+input,select,textarea{
+  width:100%;min-height:44px;padding:8px 10px;font-size:15px;font-family:inherit;
+  color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:10px;
+  outline:none;
+}
+textarea{min-height:74px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1;margin-top:0!important}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:44px;padding:0 18px;border:none;border-radius:999px;cursor:pointer;
+  background:var(--primary);color:var(--primary-text);font-size:15px;font-weight:600;
+  transition:transform .12s;
+}
+.btn:active{transform:scale(.95)}
+.btn.ghost{background:transparent;border:2px solid var(--line);color:var(--text);font-weight:500}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.small{min-height:34px;padding:0 12px;font-size:13px;flex:0 0 auto}
+.mt{margin-top:8px}
+.muted{color:var(--sub);font-size:13px}
+.center{text-align:center;padding:14px 0}
+.pre{white-space:pre-wrap;word-break:break-word}
+.grow{flex:1;min-width:0}
+/* ========== 统计卡片 ========== */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:12px 6px;text-align:center}
+.stat-t{font-size:12px;color:var(--sub)}
+.stat-v{font-size:17px;font-weight:800;margin-top:4px}
+/* ========== 列表项 ========== */
+.li{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px dashed var(--line)}
+.li:last-child{border-bottom:none}
+.li-m{flex:1;min-width:0}
+.item{padding:10px 2px;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:none}
+.item .top{display:flex;align-items:center;gap:8px}
+.item .acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.chip{display:inline-block;padding:2px 8px;border-radius:8px;font-size:12px;font-weight:700;flex:0 0 auto;background:var(--accent3);color:var(--primary)}
+.chip.ok{background:rgba(76,195,138,.16);color:#2E8B60}
+.chip.want{background:rgba(56,182,217,.16);color:#1E7C96}
+.dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto;display:inline-block}
+.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex:0 0 auto}
+.profile{display:flex;align-items:center;gap:12px}
+/* ========== 图表 ========== */
+canvas.chart{width:100%;display:block}
+.legend-row{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 0}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.rank{padding:9px 0;border-bottom:1px dashed var(--line)}
+.rank:last-child{border-bottom:none}
+.rank .bar{margin-top:6px}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--primary);border-radius:6px;transition:width .3s}
+/* ========== 日历 ========== */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wk{text-align:center;font-size:12px;color:var(--sub);padding:4px 0}
+.cell{
+  position:relative;min-height:62px;border-radius:10px;background:var(--field);
+  border:1px solid var(--line);padding:3px;font-size:13px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+}
+.cell.out{background:transparent;border-color:transparent;cursor:default;opacity:.45}
+.cell.today{box-shadow:inset 0 0 0 2px var(--primary);font-weight:800}
+.dnum{font-size:13px;font-weight:600;line-height:1}
+.ttodos{display:flex;flex-direction:column;gap:2px;width:100%}
+.ttext{
+  font-size:10px;line-height:1.3;padding:1px 4px;border-radius:5px;
+  background:var(--accent3);color:#13627A;text-align:left;width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ttext.bd{background:#FBD98A;color:#6B4E12;font-weight:700}
+.ttext.done{opacity:.55;text-decoration:line-through}
+.more{font-size:10px;color:var(--sub);text-align:center;width:100%}
+/* ========== 图片网格 ========== */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pgrid .center{grid-column:1/-1}
+.pcell{cursor:pointer;text-align:center;min-width:0}
+.pcell img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:2px solid var(--line);display:block;background:var(--field)}
+.pcell:active img{transform:scale(.96)}
+.pname{font-size:12px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)}
+.ftab{display:inline-block;padding:6px 12px;margin:0 6px 6px 0;border-radius:999px;background:var(--field);border:2px solid var(--line);font-size:13px;cursor:pointer;user-select:none}
+.ftab.on{background:linear-gradient(120deg,var(--accent),var(--accent2));border-color:transparent;color:#0E2028;font-weight:700}
+/* ========== 首页 hero / 打卡 ========== */
+.hero{background:linear-gradient(120deg,var(--hero1),var(--hero2));border:none;text-align:center;padding:22px 14px}
+.hm-greet{font-size:15px;font-weight:700}
+.hm-time{font-size:46px;font-weight:800;letter-spacing:3px;margin-top:6px;font-variant-numeric:tabular-nums}
+.hm-date{font-size:13px;opacity:.8;margin-top:4px}
+.ck-dot{
+  width:42px;height:42px;border-radius:50%;border:2px solid var(--line);
+  background:var(--field);font-size:19px;color:#13627A;flex:0 0 auto;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:transform .12s;
+}
+.ck-dot:active{transform:scale(.88)}
+.ck-dot.on{background:var(--accent);border-color:var(--accent);animation:pop .3s}
+@keyframes pop{50%{transform:scale(1.22)}}
+/* 应援色选择 */
+.color-pick{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub);flex:0 0 auto;min-height:44px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--field)}
+.color-pick input[type=color]{width:34px;height:34px;min-height:34px;border:none;background:none;padding:0;cursor:pointer}
+/* ========== 弹层 ========== */
+#modalMask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:60;display:none}
+#modal{
+  position:fixed;left:0;right:0;bottom:0;max-height:84vh;overflow-y:auto;z-index:61;display:none;
+  background:var(--card);border-radius:18px 18px 0 0;padding:16px;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
+}
+@media(min-width:900px){
+  #modal{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:460px;border-radius:18px}
+}
+.m-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+#modal img.view{width:100%;border-radius:14px;border:1px solid var(--line);margin-top:8px}
+/* ========== Toast ========== */
+#toast{
+  position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);
+  background:#123642;color:#fff;padding:10px 20px;border-radius:22px;font-size:14px;
+  opacity:0;transition:.25s;z-index:99;pointer-events:none;max-width:86vw;text-align:center;
+}
+#toast.show{opacity:.96;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<!-- 顶栏：汉堡按钮 + 标题 + 深色模式开关 -->
+<header class="topbar">
+  <button class="icon-btn" id="btnMenu" aria-label="菜单">☰</button>
+  <div class="title">京京追圆圆日记</div>
+  <button class="icon-btn" id="btnTheme" aria-label="切换深色模式">🌙</button>
+</header>
+
+<div class="mask" id="mask"></div>
+
+<!-- 侧边抽屉导航：10 个功能入口 -->
+<aside class="drawer" id="drawer">
+  <div class="brand">💙 京京追圆圆日记</div>
+  <nav id="navList"></nav>
+  <div class="foot">数据仅保存在本机浏览器 localStorage，清除缓存会丢失数据，建议定期导出备份。</div>
+</aside>
+
+<main>
+  <!-- ========== 1. 首页 ========== -->
+  <section class="page" id="page-home">
+    <div class="card hero">
+      <div class="hm-greet" id="hm-greet"></div>
+      <div class="hm-time" id="hm-time"></div>
+      <div class="hm-date" id="hm-date"></div>
+    </div>
+    <div class="stats" id="hm-stats"></div>
+    <div class="card">
+      <div class="row" style="margin-top:0">
+        <h3 class="grow" style="margin:0">💖 我的圆圆</h3>
+        <button class="btn small ghost" data-goto="idol" style="flex:0 0 auto">档案</button>
+      </div>
+      <div id="hm-idol" class="mt"></div>
+    </div>
+    <div class="card">
+      <h3>🔔 近期提醒（30 天内）</h3>
+      <div id="hm-upcoming" class="mt"></div>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-top:0">
+        <h3 class="grow" style="margin:0">✅ 今日打卡</h3>
+        <button class="btn small ghost" data-goto="cal" style="flex:0 0 auto">日历</button>
+      </div>
+      <div id="hm-checkin" class="mt"></div>
+    </div>
+  </section>
+
+  <!-- ========== 2. 圆圆档案 ========== -->
+  <section class="page" id="page-idol">
+    <h2>💖 圆圆档案</h2>
+    <div class="card" id="id-profile"></div>
+    <div class="card">
+      <h3>编辑档案</h3>
+      <input id="id-name" placeholder="名字（默认：圆圆）">
+      <div class="row">
+        <input id="id-bday" type="date" title="生日">
+        <input id="id-emoji" placeholder="头像 emoji，如 💙">
+      </div>
+      <div class="row">
+        <input id="id-nick" placeholder="全名 / 别名，如：陈哲远">
+        <label class="color-pick">应援色<input type="color" id="id-color" value="#38B6D9"></label>
+      </div>
+      <textarea id="id-bio" placeholder="简介（可选）"></textarea>
+      <button class="btn" id="id-save">保存</button>
+    </div>
+    <div class="stats" id="id-stats"></div>
+  </section>
+
+  <!-- ========== 3. 作品清单 ========== -->
+  <section class="page" id="page-work">
+    <h2>🎬 作品清单</h2>
+    <div class="card">
+      <h3 id="wk-form-title">添加作品</h3>
+      <input id="wk-title" placeholder="作品名称（必填）">
+      <select id="wk-type"><option>综艺</option><option>舞台</option><option>剧集</option><option>其他</option></select>
+      <div class="row">
+        <select id="wk-status"><option value="want">想看</option><option value="watched">已看</option></select>
+        <input id="wk-date" type="date">
+      </div>
+      <textarea id="wk-review" placeholder="短评（可选）"></textarea>
+      <div class="row">
+        <button class="btn" id="wk-add">保存</button>
+        <button class="btn ghost" id="wk-cancel" style="display:none;flex:0 0 auto">取消编辑</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-top:0">
+        <select id="wk-filter-type"><option value="">全部类型</option><option>综艺</option><option>舞台</option><option>剧集</option><option>其他</option></select>
+        <select id="wk-filter-status"><option value="">全部状态</option><option value="want">想看</option><option value="watched">已看</option></select>
+      </div>
+      <div class="stats mt" id="wk-stats"></div>
+      <div id="wk-list" class="mt"></div>
+    </div>
+  </section>
+
+  <!-- ========== 4. 追星消费 ========== -->
+  <section class="page" id="page-spend">
+    <h2>💸 追星消费</h2>
+    <div class="card">
+      <h3>记一笔</h3>
+      <select id="sp-cat">
+        <option>专辑</option><option>周边</option><option>打投</option>
+        <option>演唱会</option><option>应援</option><option>其他</option>
+      </select>
+      <div class="row">
+        <input id="sp-amount" type="number" min="0" step="0.01" placeholder="金额 ¥">
+        <input id="sp-date" type="date">
+      </div>
+      <input id="sp-note" placeholder="备注（可选）">
+      <button class="btn" id="sp-add">保存</button>
+    </div>
+    <div class="stats" id="sp-stats"></div>
+    <div class="card">
+      <h3>开销分类占比</h3>
+      <canvas class="chart" id="sp-pie"></canvas>
+      <div id="sp-legend" class="mt"></div>
+    </div>
+    <div class="card">
+      <h3>最近记录</h3>
+      <div id="sp-list"></div>
+    </div>
+  </section>
+
+  <!-- ========== 5. 日历行程 ========== -->
+  <section class="page" id="page-cal">
+    <h2>📅 日历行程</h2>
+    <div class="card">
+      <div class="row" style="margin-top:0">
+        <button class="btn ghost small" id="cal-prev">‹ 上月</button>
+        <b id="cal-title" style="text-align:center"></b>
+        <button class="btn ghost small" id="cal-next">下月 ›</button>
+      </div>
+      <button class="btn ghost mt" id="cal-today">回到今天</button>
+      <div class="cal mt" id="cal-grid"></div>
+      <div class="row mt" style="justify-content:center;gap:16px">
+        <span class="muted"><i class="legend-dot" style="display:inline-block;background:#FBD98A"></i> 偶像生日</span>
+        <span class="muted"><i class="legend-dot" style="display:inline-block;background:#8CDBEC"></i> 行程 / 演出</span>
+      </div>
+      <div class="muted mt">点击日期可添加偶像行程并打卡。</div>
+    </div>
+  </section>
+
+  <!-- ========== 6. 图片收藏 ========== -->
+  <section class="page" id="page-photo">
+    <h2>🖼️ 图片收藏</h2>
+    <div class="card">
+      <h3>上传饭拍</h3>
+      <input id="ph-taginput" placeholder="标签，空格 / 逗号分隔">
+      <input id="ph-note" placeholder="备注（可选）">
+      <button class="btn" id="ph-upload">📷 选择图片</button>
+      <input type="file" id="ph-file" accept="image/*" hidden>
+      <div class="muted mt">图片会压缩后保存在本机浏览器，容量有限，注意节制收藏。</div>
+    </div>
+    <div class="card">
+      <div class="row" style="margin-top:0">
+        <input id="ph-search" class="grow" placeholder="🔍 按标签 / 备注搜索">
+        <span class="muted" id="ph-count" style="flex:0 0 auto"></span>
+      </div>
+      <div id="ph-taglist" class="mt"></div>
+      <div id="ph-grid" class="pgrid mt"></div>
+    </div>
+  </section>
+
+  <!-- ========== 7. 语录收藏 ========== -->
+  <section class="page" id="page-quote">
+    <h2>💬 语录收藏</h2>
+    <div class="card">
+      <h3 id="qt-form-title">添加语录</h3>
+      <textarea id="qt-text" placeholder="语录内容（必填）"></textarea>
+      <input id="qt-from" placeholder="出处（可选）">
+      <div class="row">
+        <button class="btn" id="qt-add">保存</button>
+        <button class="btn ghost" id="qt-cancel" style="display:none;flex:0 0 auto">取消编辑</button>
+      </div>
+    </div>
+    <div class="card">
+      <input id="qt-search" placeholder="🔍 搜索语录 / 出处">
+      <div id="qt-list" class="mt"></div>
+    </div>
+  </section>
+
+  <!-- ========== 8. 心愿清单 ========== -->
+  <section class="page" id="page-wish">
+    <h2>🌟 心愿清单</h2>
+    <div class="card">
+      <h3 id="ws-form-title">添加心愿</h3>
+      <input id="ws-name" placeholder="想要的周边 / 小卡（必填）">
+      <select id="ws-cat"><option>小卡</option><option>周边</option><option>专辑</option><option>其他</option></select>
+      <div class="row">
+        <input id="ws-price" type="number" min="0" step="0.01" placeholder="参考价 ¥（可选）">
+        <select id="ws-status"><option value="want">想要</option><option value="owned">已拥有</option></select>
+      </div>
+      <input id="ws-note" placeholder="备注（可选）">
+      <div class="row">
+        <button class="btn" id="ws-add">保存</button>
+        <button class="btn ghost" id="ws-cancel" style="display:none;flex:0 0 auto">取消编辑</button>
+      </div>
+    </div>
+    <div class="stats" id="ws-stats"></div>
+    <div class="card">
+      <select id="ws-filter"><option value="">全部</option><option value="want">只看想要</option><option value="owned">只看已拥有</option></select>
+      <div id="ws-list" class="mt"></div>
+    </div>
+  </section>
+
+  <!-- ========== 9. 数据统计 ========== -->
+  <section class="page" id="page-stat">
+    <h2>📊 数据统计</h2>
+    <div class="stats" id="st-top"></div>
+    <div class="card">
+      <h3>追星开销 · 近 6 个月</h3>
+      <canvas class="chart" id="st-bar"></canvas>
+    </div>
+    <div class="card">
+      <h3>开销分类占比</h3>
+      <canvas class="chart" id="st-pie"></canvas>
+      <div id="st-pie-legend" class="mt"></div>
+    </div>
+    <div class="card">
+      <h3>按分类开销排行</h3>
+      <div id="st-cat-rank" class="mt"></div>
+    </div>
+    <div class="card">
+      <h3>作品 / 打卡 / 收藏 概览</h3>
+      <div id="st-misc" class="mt"></div>
+    </div>
+  </section>
+
+  <!-- ========== 10. 设置 ========== -->
+  <section class="page" id="page-set">
+    <h2>⚙️ 设置</h2>
+    <div class="card">
+      <h3>外观</h3>
+      <div class="row">
+        <button class="btn ghost" id="st-theme-light">☀️ 浅色</button>
+        <button class="btn ghost" id="st-theme-dark">🌙 深色</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>数据备份</h3>
+      <button class="btn" id="st-export">导出备份（JSON）</button>
+      <button class="btn ghost mt" id="st-import-btn">导入备份</button>
+      <input type="file" id="st-import" accept="application/json,.json" hidden>
+      <div class="muted mt">导出可保存到文件；导入会覆盖当前全部数据，请谨慎操作。</div>
+    </div>
+    <div class="card">
+      <h3>危险操作</h3>
+      <button class="btn danger" id="st-clear">清空所有数据</button>
+      <div class="muted mt">数据仅保存在本机浏览器 localStorage，清除浏览器缓存会丢失数据。</div>
+    </div>
+    <div class="card">
+      <h3>关于</h3>
+      <div class="muted">京京追圆圆日记 · 精简版 v1.0<br>纯前端单文件应用，离线可用，所有数据只存于本机。</div>
+    </div>
+  </section>
+</main>
+
+<!-- 通用弹层 -->
+<div id="modalMask"></div>
+<div id="modal">
+  <div class="m-head"><b id="mTitle"></b><button class="btn small ghost" id="mClose">关闭</button></div>
+  <div id="mBody"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================
+ * 通用工具
+ * ===================================================== */
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+/* localStorage 读写封装，统一 sx_ 前缀 */
+const DB={
+  get(k,d){try{const v=localStorage.getItem('sx_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('sx_'+k,JSON.stringify(v))}catch(e){toast('存储失败，空间可能已满（图片过多时可先导出）')}}
+};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const pad=n=>String(n).padStart(2,'0');
+const WEEK=['日','一','二','三','四','五','六'];
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>dstr(new Date());
+const parseD=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const addDays=(s,n)=>{const d=parseD(s);d.setDate(d.getDate()+n);return dstr(d)};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let toastTimer;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800)}
+/* 复制到剪贴板（含降级方案） */
+function copyText(txt,msg){
+  const done=()=>toast(msg||'已复制');
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(()=>fbCopy(txt,done))}
+  else fbCopy(txt,done);
+}
+function fbCopy(txt,done){
+  const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done()}catch(e){toast('复制失败')}
+  ta.remove();
+}
+/* Canvas 高清适配（devicePixelRatio） */
+function fitCanvas(cv,h){
+  const dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth||cv.parentElement.clientWidth||300;
+  cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+'px';
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  return[ctx,w,h];
+}
+function roundRect(ctx,x,y,w,h,r){
+  if(h<2)h=2;r=Math.min(r,w/2,h/2);
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+/* 环形饼图（分类占比），供消费页与统计页复用 */
+function drawCatPie(cv,byCat,colorMap,emptyText){
+  const total=Object.values(byCat).reduce((a,b)=>a+b,0);
+  const [ctx,W,H]=fitCanvas(cv,190);
+  const cx=W/2,cy=H/2,R=72,r=42;
+  ctx.clearRect(0,0,W,H);
+  const entries=Object.entries(byCat).filter(([,v])=>v>0);
+  if(!entries.length){
+    ctx.strokeStyle=cssVar('--line');ctx.setLineDash([4,4]);ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=cssVar('--sub');ctx.font='13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(emptyText,cx,cy);return;
+  }
+  let a=-Math.PI/2;
+  entries.forEach(([c,v])=>{
+    const a2=a+v/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,a,a2);ctx.closePath();
+    ctx.fillStyle=colorMap[c]||'#9DB4BD';ctx.fill();
+    ctx.strokeStyle=cssVar('--card');ctx.lineWidth=2;ctx.stroke();
+    a=a2;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fillStyle=cssVar('--card');ctx.fill();
+  ctx.fillStyle=cssVar('--sub');ctx.font='11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('总计',cx,cy-10);
+  ctx.fillStyle=cssVar('--text');ctx.font='bold 14px sans-serif';
+  ctx.fillText('¥'+total.toFixed(0),cx,cy+9);
+}
+
+/* =====================================================
+ * 数据模型
+ * ===================================================== */
+const DEFAULT_IDOL={name:'圆圆',nick:'陈哲远',emoji:'💙',birthday:'',color:'#38B6D9',bio:''};
+const _storedIdol=DB.get('idol',null);
+let idol=_storedIdol?{...DEFAULT_IDOL,..._storedIdol}:{...DEFAULT_IDOL};
+let works=DB.get('works',[]);
+let spends=DB.get('spends',[]);
+let events=DB.get('events',[]);
+let photos=DB.get('photos',[]);
+let quotes=DB.get('quotes',[]);
+let wishes=DB.get('wishes',[]);
+
+/* =====================================================
+ * 主题
+ * ===================================================== */
+function applyTheme(t){
+  document.documentElement.dataset.theme=t;
+  const b=$('#btnTheme');if(b)b.textContent=t==='dark'?'☀️':'🌙';
+}
+$('#btnTheme').onclick=()=>{
+  const t=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  applyTheme(t);DB.set('theme',t);renderCurrent();
+};
+
+/* =====================================================
+ * 抽屉导航 + 页面路由
+ * ===================================================== */
+const PAGES=[
+  ['home','🏠','首页'],
+  ['idol','💖','圆圆档案'],
+  ['work','🎬','作品清单'],
+  ['spend','💸','追星消费'],
+  ['cal','📅','日历行程'],
+  ['photo','🖼️','图片收藏'],
+  ['quote','💬','语录收藏'],
+  ['wish','🌟','心愿清单'],
+  ['stat','📊','数据统计'],
+  ['set','⚙️','设置']
+];
+let currentPage='home';
+const drawer=$('#drawer'),mask=$('#mask');
+function openDrawer(o){drawer.classList.toggle('open',o);mask.classList.toggle('show',o)}
+$('#btnMenu').onclick=()=>openDrawer(true);
+mask.onclick=()=>openDrawer(false);
+function buildNav(){
+  $('#navList').innerHTML=PAGES.map(p=>`<div class="nav-item" data-page="${p[0]}"><span>${p[1]}</span>${p[2]}</div>`).join('');
+  $('#navList').addEventListener('click',e=>{
+    const n=e.target.closest('.nav-item');if(n)go(n.dataset.page);
+  });
+}
+function go(p){
+  currentPage=p;
+  $$('.page').forEach(s=>s.classList.toggle('active',s.id==='page-'+p));
+  $$('.nav-item').forEach(n=>n.classList.toggle('on',n.dataset.page===p));
+  openDrawer(false);window.scrollTo(0,0);
+  RENDERS[p]&&RENDERS[p]();
+}
+function renderCurrent(){RENDERS[currentPage]&&RENDERS[currentPage]()}
+/* 首页“管理/日历”等跳转按钮 */
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-goto]');if(g)go(g.dataset.goto);
+});
+/* 触摸手势：左边缘右滑打开抽屉，抽屉上左滑关闭 */
+let _tx=0,_ty=0,_tInDrawer=false;
+document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY;_tInDrawer=drawer.contains(e.target)},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-_tx,dy=e.changedTouches[0].clientY-_ty;
+  if(Math.abs(dy)>60||Math.abs(dx)<50)return;
+  if(!_tInDrawer&&_tx<28&&dx>50)openDrawer(true);
+  else if(_tInDrawer&&dx<-50)openDrawer(false);
+},{passive:true});
+
+/* =====================================================
+ * 弹层
+ * ===================================================== */
+function showModal(){$('#modalMask').style.display='block';$('#modal').style.display='block'}
+function closeModal(){$('#modalMask').style.display='none';$('#modal').style.display='none'}
+$('#mClose').onclick=closeModal;
+$('#modalMask').onclick=closeModal;
+
+/* =====================================================
+ * 1. 首页
+ * ===================================================== */
+let _lastDay=today();
+function daysToBirthday(b){
+  if(!b||b.length<10)return null;
+  const t=new Date();t.setHours(0,0,0,0);
+  const[,,mm,dd]=b.split('-').map(Number);
+  let next=new Date(t.getFullYear(),mm-1,dd);
+  if(next<t)next=new Date(t.getFullYear()+1,mm-1,dd);
+  return Math.round((next-t)/86400000);
+}
+function upcoming(limit){
+  const t=today(),items=[];
+  const bd=daysToBirthday(idol.birthday);if(bd!=null&&bd<=30)items.push({days:bd,text:`${idol.name} 的生日`,icon:'🎂',color:'#F2B84B'});
+  events.forEach(e=>{const diff=Math.round((parseD(e.date)-parseD(t))/86400000);
+    if(diff>=0&&diff<=30)items.push({days:diff,icon:'📅',color:'#38B6D9',text:`${e.type} · ${e.title}`})});
+  items.sort((a,b)=>a.days-b.days);
+  return limit?items.slice(0,limit):items;
+}
+function refreshHomeClock(){
+  const n=new Date();
+  $('#hm-time').textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  $('#hm-date').textContent=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日 · 周${WEEK[n.getDay()]}`;
+  if(today()!==_lastDay){_lastDay=today();refreshHomeGreet();renderHome()}
+}
+function refreshHomeGreet(){
+  const h=new Date().getHours();
+  const greet=h<6?'夜深了':h<11?'早上好':h<14?'中午好':h<18?'下午好':'晚上好';
+  const emo=h<6?'🌙':h<11?'🌤️':h<14?'☀️':h<18?'🌤️':'🌙';
+  $('#hm-greet').textContent=`${greet}呀，今天也要好好追星 ${emo}`;
+}
+function initHome(){
+  refreshHomeGreet();
+  $('#hm-time').textContent=pad(new Date().getHours())+':'+pad(new Date().getMinutes())+':'+pad(new Date().getSeconds());
+  setInterval(refreshHomeClock,1000);
+  /* 今日打卡（对应日历行程）*/
+  $('#hm-checkin').addEventListener('click',e=>{
+    const t=e.target.closest('[data-hm-toggle]');if(!t)return;
+    const ev=events.find(x=>x.id===t.dataset.hmToggle);if(!ev)return;
+    ev.done=!ev.done;DB.set('events',events);renderHome();
+  });
+}
+function renderHome(){
+  const total=spends.reduce((s,r)=>s+r.amount,0);
+  const watched=works.filter(w=>w.status==='watched').length;
+  $('#hm-stats').innerHTML=
+    `<div class="stat"><div class="stat-t">追星总开销</div><div class="stat-v">¥${total.toFixed(0)}</div></div>
+     <div class="stat"><div class="stat-t">已看作品</div><div class="stat-v">${watched}</div></div>
+     <div class="stat"><div class="stat-t">收藏图片</div><div class="stat-v">${photos.length}</div></div>`;
+  const d=daysToBirthday(idol.birthday);
+  const bt=idol.birthday?`生日 ${idol.birthday.slice(5)}${d!=null?` · ${d===0?'就是今天🎉':'还有 '+d+' 天'}`:''}`:'生日未设置（去「圆圆档案」补上）';
+  $('#hm-idol').innerHTML=`<div class="li">
+      <div class="avatar" style="background:${idol.color}">${idol.emoji||'💙'}</div>
+      <div class="li-m"><div><b>${esc(idol.name)}</b>${idol.nick?` <span class="muted">${esc(idol.nick)}</span>`:''}</div>
+      <div class="muted">${bt}</div>
+      ${idol.bio?`<div class="pre" style="font-size:13px;margin-top:4px">${esc(idol.bio)}</div>`:''}</div>
+      <span class="dot" style="background:${idol.color}"></span></div>`;
+  const ups=upcoming(6);
+  $('#hm-upcoming').innerHTML=ups.length?ups.map(u=>`<div class="li">
+      <span style="font-size:18px">${u.icon}</span>
+      <div class="li-m">${esc(u.text)}</div>
+      <span class="chip" style="background:${u.color}22;color:${u.color}">${u.days===0?'今天':u.days+' 天后'}</span></div>`).join('')
+    :'<div class="muted center">30 天内暂无偶像生日或行程</div>';
+  const evs=events.filter(e=>e.date===today());
+  $('#hm-checkin').innerHTML=evs.length?evs.map(e=>`<div class="li">
+      <div class="ck-dot${e.done?' on':''}" data-hm-toggle="${e.id}">${e.done?'✓':''}</div>
+      <div class="li-m"><div>${esc(e.title)}</div><div class="muted">${esc(e.type)}</div></div></div>`).join('')
+    :'<div class="muted center">今天没有安排，去「日历行程」添加吧</div>';
+}
+
+/* =====================================================
+ * 2. 圆圆档案（单人固定偶像）
+ * ===================================================== */
+function initIdol(){
+  $('#id-save').onclick=()=>{
+    idol={...idol,
+      name:$('#id-name').value.trim()||'圆圆',
+      nick:$('#id-nick').value.trim(),
+      birthday:$('#id-bday').value||'',
+      emoji:$('#id-emoji').value.trim()||'💙',
+      color:$('#id-color').value,
+      bio:$('#id-bio').value.trim()};
+    DB.set('idol',idol);renderIdol();renderHome();renderCal();toast('档案已保存');
+  };
+}
+function renderIdol(){
+  const d=daysToBirthday(idol.birthday);
+  const bt=idol.birthday?`生日 ${idol.birthday.slice(5)}${d!=null?` · ${d===0?'就是今天🎉':'还有 '+d+' 天'}`:''}`:'生日未设置';
+  const total=spends.reduce((s,r)=>s+r.amount,0);
+  $('#id-profile').innerHTML=`<div class="profile">
+      <div class="avatar" style="background:${idol.color};width:56px;height:56px;font-size:26px">${idol.emoji||'💙'}</div>
+      <div class="grow"><div style="font-size:19px;font-weight:800">${esc(idol.name)}${idol.nick?` <span class="muted" style="font-size:13px">${esc(idol.nick)}</span>`:''}</div>
+      <div class="muted">${bt}</div></div>
+      <span class="dot" style="background:${idol.color}"></span>
+    </div>
+    ${idol.bio?`<div class="pre" style="font-size:14px;margin-top:8px">${esc(idol.bio)}</div>`:''}`;
+  $('#id-stats').innerHTML=
+    `<div class="stat"><div class="stat-t">作品</div><div class="stat-v">${works.length}</div></div>
+     <div class="stat"><div class="stat-t">消费总额</div><div class="stat-v">¥${total.toFixed(0)}</div></div>
+     <div class="stat"><div class="stat-t">图片/语录</div><div class="stat-v">${photos.length}/${quotes.length}</div></div>`;
+  $('#id-name').value=idol.name;$('#id-nick').value=idol.nick||'';$('#id-bday').value=idol.birthday||'';
+  $('#id-emoji').value=idol.emoji||'';$('#id-color').value=idol.color||'#38B6D9';$('#id-bio').value=idol.bio||'';
+}
+
+/* =====================================================
+ * 3. 作品清单
+ * ===================================================== */
+let wkEditId=null;
+function resetWorkForm(){
+  wkEditId=null;
+  $('#wk-title').value='';$('#wk-review').value='';$('#wk-date').value=today();
+  $('#wk-type').value='综艺';$('#wk-status').value='want';
+  $('#wk-form-title').textContent='添加作品';$('#wk-add').textContent='保存';
+  $('#wk-cancel').style.display='none';
+}
+function initWork(){
+  $('#wk-date').value=today();
+  $('#wk-add').onclick=()=>{
+    const title=$('#wk-title').value.trim();
+    if(!title)return toast('请输入作品名称');
+    const obj={id:wkEditId||uid(),title,type:$('#wk-type').value,status:$('#wk-status').value,
+      date:$('#wk-date').value||today(),review:$('#wk-review').value.trim()};
+    if(wkEditId){works[works.findIndex(w=>w.id===wkEditId)]=obj;toast('已更新')}
+    else{works.unshift(obj);toast('已保存')}
+    DB.set('works',works);resetWorkForm();renderWork();renderHome();
+  };
+  $('#wk-cancel').onclick=resetWorkForm;
+  ['#wk-filter-type','#wk-filter-status'].forEach(s=>$(s).addEventListener('change',renderWork));
+  $('#wk-list').addEventListener('click',e=>{
+    const t=e.target.closest('[data-wk-toggle]');
+    if(t){const w=works.find(x=>x.id===t.dataset.wkToggle);if(!w)return;
+      w.status=w.status==='watched'?'want':'watched';DB.set('works',works);renderWork();renderHome();return}
+    const ed=e.target.closest('[data-wk-edit]');
+    if(ed){const w=works.find(x=>x.id===ed.dataset.wkEdit);if(!w)return;
+      wkEditId=w.id;$('#wk-title').value=w.title;$('#wk-type').value=w.type;$('#wk-status').value=w.status;
+      $('#wk-date').value=w.date||today();$('#wk-review').value=w.review||'';
+      $('#wk-form-title').textContent='编辑作品';$('#wk-add').textContent='更新';
+      $('#wk-cancel').style.display='';window.scrollTo(0,0);return}
+    const dl=e.target.closest('[data-wk-del]');
+    if(dl){if(!confirm('删除这条作品？'))return;works=works.filter(x=>x.id!==dl.dataset.wkDel);
+      DB.set('works',works);renderWork();renderHome()}
+  });
+}
+function renderWork(){
+  const ft=$('#wk-filter-type').value,fs=$('#wk-filter-status').value;
+  const list=works.filter(w=>(!ft||w.type===ft)&&(!fs||w.status===fs))
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const watched=works.filter(w=>w.status==='watched').length;
+  $('#wk-stats').innerHTML=
+    `<div class="stat"><div class="stat-t">已看</div><div class="stat-v">${watched}</div></div>
+     <div class="stat"><div class="stat-t">想看</div><div class="stat-v">${works.length-watched}</div></div>
+     <div class="stat"><div class="stat-t">合计</div><div class="stat-v">${works.length}</div></div>`;
+  $('#wk-list').innerHTML=list.map(w=>
+    `<div class="item">
+      <div class="top">
+        <span class="chip">${esc(w.type)}</span>
+        <div class="grow"><b>${esc(w.title)}</b></div>
+        <span class="chip ${w.status==='watched'?'ok':'want'}">${w.status==='watched'?'已看':'想看'}</span>
+      </div>
+      <div class="muted">${w.date||'未记录日期'}</div>
+      ${w.review?`<div class="pre" style="font-size:13px;margin-top:6px">💬 ${esc(w.review)}</div>`:''}
+      <div class="acts">
+        <button class="btn small ghost" data-wk-toggle="${w.id}">${w.status==='watched'?'改为想看':'标记已看'}</button>
+        <button class="btn small ghost" data-wk-edit="${w.id}">编辑</button>
+        <button class="btn small ghost" data-wk-del="${w.id}">删除</button>
+      </div>
+    </div>`
+  ).join('')||'<div class="muted center">暂无作品，先添加一条吧</div>';
+}
+
+/* =====================================================
+ * 4. 追星消费
+ * ===================================================== */
+const SPEND_COLOR={'专辑':'#38B6D9','周边':'#8CDBEC','打投':'#4CC38A','演唱会':'#F2B84B','应援':'#B48CE0','其他':'#9DB4BD'};
+function initSpend(){
+  $('#sp-date').value=today();
+  $('#sp-add').onclick=()=>{
+    const amount=parseFloat($('#sp-amount').value);
+    if(!amount||amount<=0)return toast('请输入正确金额');
+    spends.unshift({id:uid(),amount:Math.round(amount*100)/100,cat:$('#sp-cat').value,
+      date:$('#sp-date').value||today(),note:$('#sp-note').value.trim()});
+    DB.set('spends',spends);$('#sp-amount').value='';$('#sp-note').value='';
+    renderSpend();renderHome();toast('已保存');
+  };
+  $('#sp-list').addEventListener('click',e=>{
+    const b=e.target.closest('[data-sp-del]');if(!b)return;
+    if(!confirm('删除这条消费记录？'))return;
+    spends=spends.filter(r=>r.id!==b.dataset.spDel);DB.set('spends',spends);renderSpend();renderHome();
+  });
+}
+function renderSpend(){
+  const total=spends.reduce((s,r)=>s+r.amount,0);
+  const ym=today().slice(0,7);
+  const month=spends.filter(r=>r.date.startsWith(ym)).reduce((s,r)=>s+r.amount,0);
+  $('#sp-stats').innerHTML=
+    `<div class="stat"><div class="stat-t">累计总开销</div><div class="stat-v">¥${total.toFixed(2)}</div></div>
+     <div class="stat"><div class="stat-t">本月开销</div><div class="stat-v">¥${month.toFixed(2)}</div></div>
+     <div class="stat"><div class="stat-t">消费笔数</div><div class="stat-v">${spends.length}</div></div>`;
+  const byCat={};spends.forEach(r=>byCat[r.cat]=(byCat[r.cat]||0)+r.amount);
+  drawCatPie($('#sp-pie'),byCat,SPEND_COLOR,'还没有消费记录');
+  $('#sp-legend').innerHTML=Object.keys(byCat).length?Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>
+    `<div class="legend-row"><i class="legend-dot" style="background:${SPEND_COLOR[c]||'#9DB4BD'}"></i>${esc(c)}<span class="muted" style="margin-left:auto">¥${v.toFixed(2)}（${total?Math.round(v/total*100):0}%）</span></div>`).join(''):'';
+  const sorted=[...spends].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  $('#sp-list').innerHTML=sorted.slice(0,80).map(r=>
+    `<div class="item">
+      <div class="top">
+        <span class="chip" style="background:${(SPEND_COLOR[r.cat]||'#9DB4BD')}22;color:${SPEND_COLOR[r.cat]||'#7DA3AE'}">${esc(r.cat)}</span>
+        <div class="grow pre">${esc(r.note)||esc(r.cat)}</div>
+        <b style="color:var(--primary)">¥${r.amount.toFixed(2)}</b>
+      </div>
+      <div class="muted">${r.date}</div>
+      <div class="acts"><button class="btn small ghost" data-sp-del="${r.id}">删除</button></div>
+    </div>`
+  ).join('')||'<div class="muted center">暂无记录</div>';
+}
+
+/* =====================================================
+ * 5. 日历行程
+ * ===================================================== */
+let calY,calM,calSel=null;
+function initCalendar(){
+  const n=new Date();calY=n.getFullYear();calM=n.getMonth();
+  $('#cal-prev').onclick=()=>{calM--;if(calM<0){calM=11;calY--}renderCal()};
+  $('#cal-next').onclick=()=>{calM++;if(calM>11){calM=0;calY++}renderCal()};
+  $('#cal-today').onclick=()=>{const t=new Date();calY=t.getFullYear();calM=t.getMonth();renderCal()};
+  $('#cal-grid').addEventListener('click',e=>{
+    const c=e.target.closest('[data-date]');if(!c||c.classList.contains('out'))return;openDay(c.dataset.date);
+  });
+  $('#mBody').addEventListener('click',onModalAction);
+}
+function openDay(date){
+  calSel=date;
+  $('#mTitle').textContent=date+' · 周'+WEEK[parseD(date).getDay()];
+  $('#mBody').innerHTML=dayModalHtml(date);
+  showModal();
+}
+function renderDayModal(){if(calSel)$('#mBody').innerHTML=dayModalHtml(calSel)}
+function dayModalHtml(date){
+  const bdays=(idol.birthday&&idol.birthday.length>=10&&idol.birthday.slice(5)===date.slice(5))?[idol]:[];
+  const evs=events.filter(e=>e.date===date);
+  let html='';
+  if(bdays.length){
+    html+=`<div class="muted" style="margin-bottom:4px">🎂 偶像生日</div>`;
+    html+=bdays.map(i=>`<div class="li"><span class="dot" style="background:${i.color}"></span><div class="li-m">${esc(i.name)} 的生日</div></div>`).join('');
+  }
+  html+=`<div class="muted" style="margin:12px 0 4px">📅 行程 / 安排</div>`;
+  html+=evs.length?evs.map(e=>
+    `<div class="li">
+      <div class="ck-dot${e.done?' on':''}" data-evt-toggle="${e.id}">${e.done?'✓':''}</div>
+      <div class="li-m"><div>${esc(e.title)}</div>
+      <div class="muted">${esc(e.type)}${e.note?' · '+esc(e.note):''}</div></div>
+      <button class="btn small ghost" data-evt-del="${e.id}">删</button>
+    </div>`).join(''):'<div class="muted center">暂无安排</div>';
+  html+=`<div class="m-head" style="margin-top:16px"><b>添加安排</b></div>
+    <input id="ev-title" placeholder="标题，如：演唱会 / 生日应援" style="margin-bottom:8px">
+    <select id="ev-type"><option>行程</option><option>演出</option><option>见面会</option><option>其他</option></select>
+    <input id="ev-note" placeholder="备注（可选）">
+    <button class="btn mt" id="ev-add">添加到 ${date}</button>`;
+  return html;
+}
+function onModalAction(e){
+  const tg=e.target.closest('[data-evt-toggle]');
+  if(tg){const ev=events.find(x=>x.id===tg.dataset.evtToggle);if(ev){ev.done=!ev.done;DB.set('events',events);renderDayModal();renderCal();renderHome()}return}
+  const del=e.target.closest('[data-evt-del]');
+  if(del){if(!confirm('删除这条安排？'))return;events=events.filter(x=>x.id!==del.dataset.evtDel);DB.set('events',events);renderDayModal();renderCal();renderHome();return}
+  const pd=e.target.closest('[data-photo-del]');
+  if(pd){if(!confirm('删除这张图片？'))return;photos=photos.filter(x=>x.id!==pd.dataset.photoDel);DB.set('photos',photos);closeModal();renderPhoto();renderHome();return}
+  if(e.target.closest('#ev-add')){
+    const title=$('#ev-title').value.trim();
+    if(!title)return toast('请输入标题');
+    events.push({id:uid(),date:calSel,title,type:$('#ev-type').value,
+      note:$('#ev-note').value.trim(),done:false});
+    DB.set('events',events);renderDayModal();renderCal();renderHome();toast('已添加');
+  }
+}
+function renderCal(){
+  $('#cal-title').textContent=`${calY}年${calM+1}月`;
+  const first=new Date(calY,calM,1).getDay();
+  const days=new Date(calY,calM+1,0).getDate();
+  const prevDays=new Date(calY,calM,0).getDate();
+  let html=WEEK.map(w=>`<div class="wk">${w}</div>`).join('');
+  for(let i=first-1;i>=0;i--)html+=`<div class="cell out"><span class="dnum">${prevDays-i}</span></div>`;
+  for(let d=1;d<=days;d++){
+    const ds=`${calY}-${pad(calM+1)}-${pad(d)}`;
+    const bdays=(idol.birthday&&idol.birthday.length>=10&&idol.birthday.slice(5)===ds.slice(5))?[idol]:[];
+    const evs=events.filter(e=>e.date===ds);
+    const cls='cell'+(ds===today()?' today':'');
+    let chips='';
+    if(bdays.length)chips+=`<span class="ttext bd">🎂 ${esc(bdays.map(i=>i.name).join('、'))}</span>`;
+    evs.slice(0,2).forEach(e=>chips+=`<span class="ttext${e.done?' done':''}">${esc(e.type)}·${esc(e.title)}</span>`);
+    if(evs.length>2)chips+=`<span class="more">+${evs.length-2}</span>`;
+    html+=`<div class="${cls}" data-date="${ds}"><span class="dnum">${d}</span><div class="ttodos">${chips}</div></div>`;
+  }
+  const remain=(7-((first+days)%7))%7;
+  for(let i=1;i<=remain;i++)html+=`<div class="cell out"><span class="dnum">${i}</span></div>`;
+  $('#cal-grid').innerHTML=html;
+}
+
+/* =====================================================
+ * 6. 图片收藏
+ * ===================================================== */
+function compressImage(file,maxDim,quality){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>h&&w>maxDim){h=Math.round(h*maxDim/w);w=maxDim}
+        else if(h>=w&&h>maxDim){w=Math.round(w*maxDim/h);h=maxDim}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        res(cv.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=()=>rej(new Error('图片读取失败'));img.src=r.result;
+    };
+    r.onerror=()=>rej(new Error('读取失败'));r.readAsDataURL(file);
+  });
+}
+function parseTags(s){return [...new Set(s.split(/[,，\s]+/).map(t=>t.trim()).filter(Boolean))]}
+function initPhoto(){
+  $('#ph-upload').onclick=()=>$('#ph-file').click();
+  $('#ph-file').addEventListener('change',async e=>{
+    const f=e.target.files[0];e.target.value='';if(!f)return;
+    toast('正在压缩…');
+    try{
+      const dataUrl=await compressImage(f,1080,.72);
+      photos.unshift({id:uid(),dataUrl,tags:parseTags($('#ph-taginput').value),
+        note:$('#ph-note').value.trim(),date:today()});
+      DB.set('photos',photos);
+      $('#ph-taginput').value='';$('#ph-note').value='';
+      renderPhoto();renderHome();toast('已收藏');
+    }catch(err){toast(err.message||'上传失败')}
+  });
+  $('#ph-search').addEventListener('input',renderPhoto);
+  $('#ph-taglist').addEventListener('click',e=>{
+    const t=e.target.closest('[data-ptag]');if(!t)return;
+    $('#ph-search').value=t.dataset.ptag;renderPhoto();
+  });
+  $('#ph-grid').addEventListener('click',e=>{
+    const c=e.target.closest('[data-view]');if(!c)return;
+    const p=photos.find(x=>x.id===c.dataset.view);if(!p)return;
+    $('#mTitle').textContent='饭拍预览';
+    $('#mBody').innerHTML=`<img class="view" src="${p.dataUrl}" alt="">
+      <div class="muted mt">${esc((p.tags||[]).join(' '))||'无标签'}${p.note?' · '+esc(p.note):''}</div>
+      <div class="acts mt"><button class="btn small danger" data-photo-del="${p.id}">删除这张</button></div>`;
+    showModal();
+  });
+}
+function renderPhoto(){
+  const kw=$('#ph-search').value.trim().toLowerCase();
+  $('#ph-count').textContent=`共 ${photos.length} 张`;
+  const allTags=[...new Set(photos.flatMap(p=>p.tags||[]))];
+  $('#ph-taglist').innerHTML=allTags.map(t=>`<span class="ftab${kw&&t.toLowerCase()===kw?' on':''}" data-ptag="${esc(t)}">${esc(t)}</span>`).join('');
+  const list=photos.filter(p=>!kw||(p.tags||[]).join(' ').toLowerCase().includes(kw)||(p.note||'').toLowerCase().includes(kw))
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  $('#ph-grid').innerHTML=list.length?list.map(p=>`<div class="pcell" data-view="${p.id}">
+      <img src="${p.dataUrl}" alt="">
+      <div class="pname">${esc(p.note||(p.tags||[]).join(' ')||'饭拍')}</div></div>`).join('')
+    :'<div class="muted center">暂无图片，点击上方「选择图片」收藏第一张吧</div>';
+}
+
+/* =====================================================
+ * 7. 语录收藏
+ * ===================================================== */
+let qtEditId=null;
+function resetQuoteForm(){
+  qtEditId=null;$('#qt-text').value='';$('#qt-from').value='';
+  $('#qt-form-title').textContent='添加语录';$('#qt-add').textContent='保存';
+  $('#qt-cancel').style.display='none';
+}
+function initQuote(){
+  $('#qt-add').onclick=()=>{
+    const text=$('#qt-text').value.trim();
+    if(!text)return toast('请输入语录内容');
+    const obj={id:qtEditId||uid(),text,from:$('#qt-from').value.trim(),date:today()};
+    if(qtEditId){quotes[quotes.findIndex(q=>q.id===qtEditId)]=obj;toast('已更新')}
+    else{quotes.unshift(obj);toast('已保存')}
+    DB.set('quotes',quotes);resetQuoteForm();renderQuote();
+  };
+  $('#qt-cancel').onclick=resetQuoteForm;
+  $('#qt-search').addEventListener('input',renderQuote);
+  $('#qt-list').addEventListener('click',e=>{
+    const b=e.target.closest('[data-qt-act]');if(!b)return;
+    const q=quotes.find(x=>x.id===b.dataset.id);if(!q)return;
+    const act=b.dataset.qtAct;
+    if(act==='copy')copyText(q.text,'语录已复制');
+    else if(act==='edit'){
+      qtEditId=q.id;$('#qt-text').value=q.text;$('#qt-from').value=q.from||'';
+      $('#qt-form-title').textContent='编辑语录';$('#qt-add').textContent='更新';
+      $('#qt-cancel').style.display='';window.scrollTo(0,0);
+    }else if(act==='del'){
+      if(!confirm('删除这条语录？'))return;
+      quotes=quotes.filter(x=>x.id!==q.id);DB.set('quotes',quotes);renderQuote();
+    }
+  });
+}
+function renderQuote(){
+  const kw=$('#qt-search').value.trim().toLowerCase();
+  const list=quotes.filter(q=>!kw||q.text.toLowerCase().includes(kw)||(q.from||'').toLowerCase().includes(kw));
+  $('#qt-list').innerHTML=list.map(q=>{
+    return `<div class="item">
+      <div class="pre" style="font-size:15px">❝ ${esc(q.text)}</div>
+      <div class="muted" style="margin-top:4px">${q.from?'— '+esc(q.from):''}</div>
+      <div class="acts">
+        <button class="btn small ghost" data-qt-act="copy" data-id="${q.id}">一键复制</button>
+        <button class="btn small ghost" data-qt-act="edit" data-id="${q.id}">编辑</button>
+        <button class="btn small ghost" data-qt-act="del" data-id="${q.id}">删除</button>
+      </div>
+    </div>`;
+  }).join('')||'<div class="muted center">暂无语录，收藏一句偶像的话吧</div>';
+}
+
+/* =====================================================
+ * 8. 心愿清单
+ * ===================================================== */
+let wsEditId=null;
+function resetWishForm(){
+  wsEditId=null;$('#ws-name').value='';$('#ws-price').value='';$('#ws-note').value='';
+  $('#ws-cat').value='小卡';$('#ws-status').value='want';
+  $('#ws-form-title').textContent='添加心愿';$('#ws-add').textContent='保存';
+  $('#ws-cancel').style.display='none';
+}
+function initWish(){
+  $('#ws-add').onclick=()=>{
+    const name=$('#ws-name').value.trim();
+    if(!name)return toast('请输入心愿名称');
+    const obj={id:wsEditId||uid(),name,cat:$('#ws-cat').value,status:$('#ws-status').value,
+      price:Math.max(0,parseFloat($('#ws-price').value)||0),note:$('#ws-note').value.trim()};
+    if(wsEditId){wishes[wishes.findIndex(w=>w.id===wsEditId)]=obj;toast('已更新')}
+    else{wishes.unshift(obj);toast('已保存')}
+    DB.set('wishes',wishes);resetWishForm();renderWish();
+  };
+  $('#ws-cancel').onclick=resetWishForm;
+  $('#ws-filter').addEventListener('change',renderWish);
+  $('#ws-list').addEventListener('click',e=>{
+    const t=e.target.closest('[data-ws-toggle]');
+    if(t){const w=wishes.find(x=>x.id===t.dataset.wsToggle);if(!w)return;
+      w.status=w.status==='owned'?'want':'owned';DB.set('wishes',wishes);renderWish();return}
+    const ed=e.target.closest('[data-ws-edit]');
+    if(ed){const w=wishes.find(x=>x.id===ed.dataset.wsEdit);if(!w)return;
+      wsEditId=w.id;$('#ws-name').value=w.name;$('#ws-cat').value=w.cat;$('#ws-status').value=w.status;
+      $('#ws-price').value=w.price||'';$('#ws-note').value=w.note||'';
+      $('#ws-form-title').textContent='编辑心愿';$('#ws-add').textContent='更新';
+      $('#ws-cancel').style.display='';window.scrollTo(0,0);return}
+    const dl=e.target.closest('[data-ws-del]');
+    if(dl){if(!confirm('删除这个心愿？'))return;wishes=wishes.filter(x=>x.id!==dl.dataset.wsDel);DB.set('wishes',wishes);renderWish()}
+  });
+}
+function renderWish(){
+  const f=$('#ws-filter').value;
+  const list=wishes.filter(w=>!f||w.status===f);
+  const want=wishes.filter(w=>w.status==='want');
+  const owned=wishes.filter(w=>w.status==='owned');
+  const wantPrice=want.reduce((s,w)=>s+w.price,0);
+  $('#ws-stats').innerHTML=
+    `<div class="stat"><div class="stat-t">想要</div><div class="stat-v">${want.length}</div></div>
+     <div class="stat"><div class="stat-t">已拥有</div><div class="stat-v">${owned.length}</div></div>
+     <div class="stat"><div class="stat-t">想要参考价</div><div class="stat-v">¥${wantPrice.toFixed(0)}</div></div>`;
+  $('#ws-list').innerHTML=list.map(w=>{
+    return `<div class="item">
+      <div class="top">
+        <span class="chip">${esc(w.cat)}</span>
+        <div class="grow"><b>${esc(w.name)}</b></div>
+        <span class="chip ${w.status==='owned'?'ok':'want'}">${w.status==='owned'?'已拥有':'想要'}</span>
+      </div>
+      <div class="muted">${w.price?'参考价 ¥'+w.price.toFixed(2):''}${w.note?(w.price?' · ':'')+esc(w.note):''}</div>
+      <div class="acts">
+        <button class="btn small ghost" data-ws-toggle="${w.id}">${w.status==='owned'?'改为想要':'标记已拥有'}</button>
+        <button class="btn small ghost" data-ws-edit="${w.id}">编辑</button>
+        <button class="btn small ghost" data-ws-del="${w.id}">删除</button>
+      </div>
+    </div>`;
+  }).join('')||'<div class="muted center">心愿清单还是空的，把想要的周边记下来吧</div>';
+}
+
+/* =====================================================
+ * 9. 数据统计
+ * ===================================================== */
+function drawSpendBar(){
+  const [ctx,W,H]=fitCanvas($('#st-bar'),190);
+  ctx.clearRect(0,0,W,H);
+  const months=[],now=new Date();
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(d.getFullYear()+'-'+pad(d.getMonth()+1))}
+  const vals=months.map(m=>spends.filter(r=>r.date&&r.date.startsWith(m)).reduce((s,r)=>s+r.amount,0));
+  const max=Math.max(...vals,1);
+  const pl=34,pr=8,pt=16,pb=24,bw=(W-pl-pr)/months.length;
+  ctx.strokeStyle=cssVar('--line');ctx.beginPath();ctx.moveTo(pl,H-pb);ctx.lineTo(W-pr,H-pb);ctx.stroke();
+  ctx.font='10px sans-serif';
+  months.forEach((m,i)=>{
+    const v=vals[i],bh=(H-pt-pb)*v/max,x=pl+i*bw+bw*.18,y=H-pb-bh,w=bw*.64;
+    ctx.fillStyle=cssVar('--accent');roundRect(ctx,x,y,w,bh,6);ctx.fill();
+    ctx.fillStyle=cssVar('--sub');ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText(m.slice(5)+'月',x+w/2,H-pb+6);
+    if(v){ctx.fillStyle=cssVar('--text');ctx.font='bold 10px sans-serif';ctx.textBaseline='bottom';ctx.fillText(v.toFixed(0),x+w/2,y-2);ctx.font='10px sans-serif'}
+  });
+}
+function initStat(){/* 无需绑定 */}
+function renderStat(){
+  const total=spends.reduce((s,r)=>s+r.amount,0);
+  const ym=today().slice(0,7);
+  const month=spends.filter(r=>r.date&&r.date.startsWith(ym)).reduce((s,r)=>s+r.amount,0);
+  $('#st-top').innerHTML=
+    `<div class="stat"><div class="stat-t">总开销</div><div class="stat-v">¥${total.toFixed(0)}</div></div>
+     <div class="stat"><div class="stat-t">本月开销</div><div class="stat-v">¥${month.toFixed(0)}</div></div>
+     <div class="stat"><div class="stat-t">消费笔数</div><div class="stat-v">${spends.length}</div></div>`;
+  drawSpendBar();
+  const byCat={};spends.forEach(r=>byCat[r.cat]=(byCat[r.cat]||0)+r.amount);
+  drawCatPie($('#st-pie'),byCat,SPEND_COLOR,'暂无消费数据');
+  $('#st-pie-legend').innerHTML=Object.keys(byCat).length?Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>
+    `<div class="legend-row"><i class="legend-dot" style="background:${SPEND_COLOR[c]||'#9DB4BD'}"></i>${esc(c)}<span class="muted" style="margin-left:auto">¥${v.toFixed(0)}（${total?Math.round(v/total*100):0}%）</span></div>`).join(''):'';
+  const rows=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  $('#st-cat-rank').innerHTML=rows.length?rows.map(([k,v])=>
+    `<div class="rank"><div class="row" style="margin-top:0"><span class="grow">${esc(k)}</span><span class="muted">¥${v.toFixed(0)}</span></div>
+      <div class="bar"><i style="width:${total?v/total*100:0}%;background:${SPEND_COLOR[k]||'#9DB4BD'}"></i></div></div>`).join(''):'<div class="muted center">暂无消费数据</div>';
+  const watched=works.filter(w=>w.status==='watched').length,wantW=works.filter(w=>w.status==='want').length;
+  const doneEv=events.filter(e=>e.done).length;
+  const ownedW=wishes.filter(w=>w.status==='owned').length;
+  const wantPrice=wishes.filter(w=>w.status==='want').reduce((s,w)=>s+(w.price||0),0);
+  $('#st-misc').innerHTML=
+    `<div class="legend-row">🎬 作品：已看 ${watched} · 想看 ${wantW}</div>
+     <div class="legend-row">✅ 行程打卡：已完成 ${doneEv} / 共 ${events.length}</div>
+     <div class="legend-row">🌟 心愿：已拥有 ${ownedW} · 想要 ${wishes.length-ownedW}（参考价合计 ¥${wantPrice.toFixed(0)}）</div>
+     <div class="legend-row">🖼️ 图片 ${photos.length} 张 · 💬 语录 ${quotes.length} 条</div>`;
+}
+
+/* =====================================================
+ * 10. 设置
+ * ===================================================== */
+function initSet(){
+  $('#st-theme-light').onclick=()=>{applyTheme('light');DB.set('theme','light');renderCurrent()};
+  $('#st-theme-dark').onclick=()=>{applyTheme('dark');DB.set('theme','dark');renderCurrent()};
+  $('#st-export').onclick=()=>{
+    const data={app:'京京追圆圆日记',version:1,exportAt:new Date().toISOString(),
+      idol,works,spends,events,photos,quotes,wishes,theme:DB.get('theme','light')};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`京京追圆圆日记备份_${today()}.json`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('已导出备份');
+  };
+  $('#st-import-btn').onclick=()=>$('#st-import').click();
+  $('#st-import').addEventListener('change',e=>{
+    const f=e.target.files[0];e.target.value='';if(!f)return;
+    if(!confirm('导入会覆盖当前全部数据，确定继续？'))return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const d=JSON.parse(r.result);
+        ['works','spends','events','photos','quotes','wishes'].forEach(k=>{if(Array.isArray(d[k]))DB.set(k,d[k])});
+        if(d.idol)DB.set('idol',{...DEFAULT_IDOL,...d.idol});
+        if(d.theme)DB.set('theme',d.theme);
+        toast('导入成功');setTimeout(()=>location.reload(),400);
+      }catch(err){toast('文件格式不正确')}
+    };
+    r.readAsText(f);
+  });
+  $('#st-clear').onclick=()=>{
+    if(!confirm('将删除全部数据（圆圆档案/作品/消费/行程/图片/语录/心愿），且不可恢复。确定清空？'))return;
+    ['idol','works','spends','events','photos','quotes','wishes'].forEach(k=>localStorage.removeItem('sx_'+k));
+    toast('已清空');setTimeout(()=>location.reload(),300);
+  };
+}
+function renderSet(){/* 静态页面 */}
+
+/* =====================================================
+ * 渲染映射 + 启动
+ * ===================================================== */
+const RENDERS={home:renderHome,idol:renderIdol,work:renderWork,spend:renderSpend,cal:renderCal,
+  photo:renderPhoto,quote:renderQuote,wish:renderWish,stat:renderStat,set:renderSet};
+applyTheme(DB.get('theme','light'));
+buildNav();
+initHome();initIdol();initWork();initSpend();initCalendar();initPhoto();initQuote();initWish();initStat();initSet();
+go('home');
+</script>
+</body>
+</html>
